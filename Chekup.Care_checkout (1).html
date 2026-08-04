@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Clinic Onboarding</title>
+<style>
+  :root {
+    --teal: #2E5AAC;
+    --teal-dark: #1E3A66;
+    --teal-light: #E8EDF6;
+    --coral: #D9622B;
+    --text-primary: #23262B;
+    --text-secondary: #5C6470;
+    --text-muted: #8B929B;
+    --border: #DEE2E8;
+    --surface: #FFFFFF;
+    --surface-1: #F2F4F7;
+    --bg-accent: #E8EDF6;
+    --text-accent: #1E3A66;
+    --bg-danger: #FCEBEB;
+    --text-danger: #A32D2D;
+    --amber-bg: #FEF3E2;
+    --amber-text: #B45309;
+    --green-bg: #E7F6EC;
+    --green-text: #1E7A3D;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #EEF1F5;
+    color: var(--text-primary);
+  }
+  .topbar {
+    background: var(--teal-dark);
+    color: #fff;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+  }
+  .topbar .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #7FE0D0;
+  }
+  .topbar .sub {
+    font-size: 12.5px;
+    color: #BFE3E4;
+  }
+  .wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2 .badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--teal);
+    background: var(--teal-light);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .field label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+  .field input, .field select {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .field input:focus, .field select:focus { border-color: var(--teal); }
+  .field-row { display: flex; gap: 12px; }
+  .field-row .field { flex: 1; margin-bottom: 0; }
+  .doctor-block {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: var(--surface-1);
+  }
+  .doctor-block .doctor-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--teal-dark);
+    margin-bottom: 10px;
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .stepper button {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--teal-dark);
+    cursor: pointer;
+  }
+  .stepper button:hover { background: var(--teal-light); }
+  .stepper .count {
+    font-size: 15px;
+    font-weight: 700;
+    min-width: 20px;
+    text-align: center;
+  }
+  .stepper .hint { font-size: 12.5px; color: var(--text-muted); }
+  .coupon-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .coupon-row .left { display: flex; flex-direction: column; gap: 2px; }
+  .coupon-row .left .title { font-size: 14px; font-weight: 600; }
+  .coupon-row .left .stock {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--coral);
+  }
+  .coupon-row select {
+    font-family: inherit;
+    font-size: 13.5px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .urgency {
+    display: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--amber-text);
+    background: var(--amber-bg);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 6px;
+  }
+  .urgency.show { display: block; }
+  .neg-slider { display: flex; align-items: center; gap: 14px; margin: 14px 0 8px; }
+  .neg-slider label { font-size: 14px; color: var(--text-secondary); width: 150px; flex-shrink: 0; }
+  input[type="range"] { flex: 1; accent-color: var(--teal); height: 4px; }
+  .neg-slider .val { font-size: 14px; font-weight: 700; min-width: 40px; text-align: right; }
+  .approval-box {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--amber-text);
+    background: var(--amber-bg);
+    border-radius: 8px;
+    padding: 9px 10px 9px 14px;
+  }
+  .approval-box.show { display: flex; }
+  .approval-box.approved { color: var(--green-text); background: var(--green-bg); }
+  .approval-box .apply-btn { padding: 6px 12px; font-size: 12px; }
+  .apply-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--teal);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--teal-dark);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .apply-btn:hover { background: var(--teal); color: #fff; }
+  .apply-btn:disabled { opacity: 0.7; cursor: default; }
+
+  /* Order summary */
+  .summary { position: sticky; top: 20px; }
+  .summary .card { padding: 22px 22px 20px; }
+  .sum-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    padding: 6px 0;
+  }
+  .sum-row.discount { color: var(--green-text); }
+  .sum-row .amt { color: var(--text-primary); font-weight: 500; }
+  .sum-row.discount .amt { color: var(--green-text); font-weight: 500; }
+  .sum-divider { border-top: 1px solid var(--border); margin: 10px 0; }
+  .sum-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-top: 6px;
+  }
+  .sum-total .label { font-size: 13.5px; color: var(--text-secondary); font-weight: 600; }
+  .sum-total .amt { font-size: 26px; font-weight: 800; color: var(--teal-dark); }
+  .gst-note { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+  .warning {
+    display: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-danger);
+    background: var(--bg-danger);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 4px 0 10px;
+  }
+  .warning.show { display: block; }
+  .summary-placeholder {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding: 18px 4px 6px;
+  }
+  .mrp-row { padding-top: 0; }
+  .amt.strike {
+    text-decoration: line-through;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .savings-badge {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--green-text);
+    background: var(--green-bg);
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  .confirm-btn {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    border: none;
+    border-radius: 9px;
+    background: var(--teal-dark);
+    color: #fff;
+    cursor: pointer;
+  }
+  .confirm-btn:hover { background: #142A4A; }
+  .confirm-btn:disabled { background: var(--border); color: var(--text-muted); cursor: default; }
+  .timer-box {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-danger);
+    background: var(--bg-danger);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .timer-box.show { display: flex; }
+  .timer-box strong { font-variant-numeric: tabular-nums; }
+  .clock-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-danger); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>Clinic Onboarding — Checkout</div>
+  <div class="sub">Sales tool</div>
+</div>
+
+<div class="wrap">
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="card">
+      <h2>Plan duration <span class="badge" id="duration-badge">1 year</span></h2>
+      <div class="field">
+        <label for="plan-duration">Select tenure</label>
+        <select id="plan-duration">
+          <option value="1">1 Year</option>
+          <option value="2">2 Years — extra 5% off</option>
+          <option value="3">3 Years — extra 5% off</option>
+        </select>
+      </div>
+      <div class="urgency" id="duration-urgency">Extra 5% discount unlocked for multi-year plans.</div>
+    </div>
+
+    <div class="card">
+      <h2>Doctors on plan <span class="badge" id="dr-count-badge">1 doctor</span></h2>
+      <div class="field">
+        <label for="dr-count">Number of doctors</label>
+        <select id="dr-count">
+          <option value="1">1 doctor</option>
+          <option value="2">2 doctors</option>
+          <option value="3">3 doctors</option>
+          <option value="4">4 doctors</option>
+          <option value="5">5 doctors</option>
+        </select>
+      </div>
+      <div id="doctor-fields"></div>
+    </div>
+
+    <div class="card">
+      <h2>Extra staff <span class="badge" id="staff-price-badge">₹1,694 / staff</span></h2>
+      <div class="stepper">
+        <button type="button" id="staff-minus">−</button>
+        <span class="count" id="staff-count">0</span>
+        <button type="button" id="staff-plus">+</button>
+        <span class="hint" id="staff-hint">Beyond the 1 staff login already included</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Discounts</h2>
+
+      <div class="neg-slider">
+        <label for="level1">Discount level 1</label>
+        <input type="range" id="level1" min="0" max="38" step="1" value="0">
+        <span class="val" id="level1-out">0%</span>
+      </div>
+
+      <div class="neg-slider">
+        <label for="festival">Festival offer</label>
+        <input type="range" id="festival" min="0" max="5" step="1" value="0">
+        <span class="val" id="festival-out">0%</span>
+      </div>
+
+      <div class="coupon-row">
+        <div class="left">
+          <span class="title">Employee coupon</span>
+          <span class="stock" id="coupon-stock">1 coupon left</span>
+        </div>
+        <select id="coupon-select">
+          <option value="none">No coupon applied</option>
+          <option value="apply">Apply employee coupon (5%)</option>
+        </select>
+      </div>
+      <div class="urgency" id="coupon-urgency">Only 5% discount allowed — this is your last coupon.</div>
+
+      <div class="neg-slider">
+        <label for="extra">Manager discount</label>
+        <input type="range" id="extra" min="0" max="40" step="1" value="0">
+        <span class="val" id="extra-out">0%</span>
+      </div>
+      <div class="approval-box" id="approval-box">
+        <span id="approval-status">Requires manager approval to apply</span>
+        <button type="button" id="approval-btn" class="apply-btn">Send for approval</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="summary">
+    <div class="card">
+      <h2>Order summary</h2>
+
+      <div class="summary-placeholder" id="summary-placeholder">
+        Move a discount lever on the left — pricing will appear here as you work through it with the customer.
+      </div>
+
+      <div id="summary-content" style="display:none;">
+        <div class="sum-row mrp-row">
+          <span>MRP (list price)</span><span class="amt strike" id="mrp-amt"></span>
+        </div>
+        <div class="sum-row discount" id="level1-line" style="display:none;">
+          <span id="level1-line-label"></span><span class="amt" id="level1-line-amt"></span>
+        </div>
+        <div class="sum-row discount" id="festival-line" style="display:none;">
+          <span id="festival-line-label"></span><span class="amt" id="festival-line-amt"></span>
+        </div>
+        <div class="sum-row discount" id="coupon-line" style="display:none;">
+          <span>Employee coupon (5%)</span><span class="amt" id="coupon-line-amt"></span>
+        </div>
+        <div class="sum-row discount" id="extra-line" style="display:none;">
+          <span id="extra-line-label"></span><span class="amt" id="extra-line-amt"></span>
+        </div>
+        <div class="warning" id="floor-warning">Maximum discount applied for this configuration.</div>
+        <div class="sum-row" id="staff-line" style="display:none;">
+          <span id="staff-line-label"></span><span class="amt" id="staff-line-amt"></span>
+        </div>
+        <div class="sum-row discount" id="duration-line" style="display:none;">
+          <span id="duration-line-label"></span><span class="amt" id="duration-line-amt"></span>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-row"><span>GST (18%)</span><span class="amt" id="gst-amt"></span></div>
+        <div class="sum-total"><span class="label">Total payable</span><span class="amt" id="total-amt"></span></div>
+        <div class="gst-note">Inclusive of applicable taxes</div>
+        <div class="savings-badge" id="savings-badge"></div>
+
+        <button type="button" id="confirm-btn" class="confirm-btn">Confirm price</button>
+        <div class="timer-box" id="timer-box">
+          <i class="clock-dot"></i>
+          <span>Offer valid for <strong id="timer-text">10:00</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MRP_PER_DR_YEAR = 15000;
+const GST_RATE = 0.18;
+
+// Floor pricing (pre-GST) sourced from Pricing_sheet_11.xlsx — the true
+// bottom price for each doctor count, per plan duration. Includes 1 staff.
+const FLOOR_DR = {
+  1: { 1: 6000,  2: 11400, 3: 16650 },
+  2: { 1: 12000, 2: 22440, 3: 33300 },
+  3: { 1: 18000, 2: 33480, 3: 49842 },
+  4: { 1: 24000, 2: 44160, 3: 65880 },
+  5: { 1: 30000, 2: 54600, 3: 81000 }
+};
+
+// Additional staff floor pricing (beyond the 1 staff already included above).
+// 1st & 2nd additional staff at the higher rate, 3rd+ at the discounted rate.
+const FLOOR_STAFF_TIER1 = { 1: 1694, 2: 3218.6, 3: 4700.85 };
+const FLOOR_STAFF_TIER2 = { 1: 847,  2: 1609.3, 3: 2350.425 };
+
+function staffFloorTotal(k, years) {
+  let total = 0;
+  for (let i = 1; i <= k; i++) {
+    total += i <= 2 ? FLOOR_STAFF_TIER1[years] : FLOOR_STAFF_TIER2[years];
+  }
+  return total;
+}
+
+const drCountEl = document.getElementById("dr-count");
+const drCountBadge = document.getElementById("dr-count-badge");
+const doctorFieldsEl = document.getElementById("doctor-fields");
+
+const planDurationEl = document.getElementById("plan-duration");
+const durationBadge = document.getElementById("duration-badge");
+const durationUrgency = document.getElementById("duration-urgency");
+const durationLine = document.getElementById("duration-line");
+const durationLineLabel = document.getElementById("duration-line-label");
+const durationLineAmt = document.getElementById("duration-line-amt");
+
+const staffMinus = document.getElementById("staff-minus");
+const staffPlus = document.getElementById("staff-plus");
+const staffCountEl = document.getElementById("staff-count");
+const staffLine = document.getElementById("staff-line");
+const staffLineLabel = document.getElementById("staff-line-label");
+const staffLineAmt = document.getElementById("staff-line-amt");
+const staffPriceBadge = document.getElementById("staff-price-badge");
+const staffHint = document.getElementById("staff-hint");
+let staffCount = 0;
+
+const couponSelect = document.getElementById("coupon-select");
+const couponUrgency = document.getElementById("coupon-urgency");
+const couponLine = document.getElementById("coupon-line");
+const couponLineAmt = document.getElementById("coupon-line-amt");
+
+const level1El = document.getElementById("level1");
+const level1Out = document.getElementById("level1-out");
+const level1Line = document.getElementById("level1-line");
+const level1LineLabel = document.getElementById("level1-line-label");
+const level1LineAmt = document.getElementById("level1-line-amt");
+
+const festivalEl = document.getElementById("festival");
+const festivalOut = document.getElementById("festival-out");
+const festivalLine = document.getElementById("festival-line");
+const festivalLineLabel = document.getElementById("festival-line-label");
+const festivalLineAmt = document.getElementById("festival-line-amt");
+
+const extraEl = document.getElementById("extra");
+const extraOut = document.getElementById("extra-out");
+const approvalBox = document.getElementById("approval-box");
+const approvalStatus = document.getElementById("approval-status");
+const approvalBtn = document.getElementById("approval-btn");
+const extraLine = document.getElementById("extra-line");
+const extraLineLabel = document.getElementById("extra-line-label");
+const extraLineAmt = document.getElementById("extra-line-amt");
+let extraApproved = false;
+
+const gstAmt = document.getElementById("gst-amt");
+const totalAmt = document.getElementById("total-amt");
+const mrpAmt = document.getElementById("mrp-amt");
+const savingsBadge = document.getElementById("savings-badge");
+const floorWarning = document.getElementById("floor-warning");
+const summaryPlaceholder = document.getElementById("summary-placeholder");
+const summaryContent = document.getElementById("summary-content");
+let summaryRevealed = false;
+
+function revealSummary() {
+  if (summaryRevealed) return;
+  summaryRevealed = true;
+  summaryPlaceholder.style.display = "none";
+  summaryContent.style.display = "block";
+}
+
+const confirmBtn = document.getElementById("confirm-btn");
+const timerBox = document.getElementById("timer-box");
+const timerText = document.getElementById("timer-text");
+let confirmed = false;
+let timerInterval = null;
+
+function inr(n) {
+  return "\u20B9" + Math.round(n).toLocaleString("en-IN");
+}
+
+function renderDoctorFields() {
+  const n = parseInt(drCountEl.value);
+  drCountBadge.textContent = n + (n === 1 ? " doctor" : " doctors");
+  doctorFieldsEl.innerHTML = "";
+  for (let i = 1; i <= n; i++) {
+    const block = document.createElement("div");
+    block.className = "doctor-block";
+    block.innerHTML =
+      '<div class="doctor-title">Doctor ' + i + '</div>' +
+      '<div class="field"><label>Doctor name</label><input type="text" placeholder="Dr. Full name" data-role="name" data-idx="' + i + '"></div>' +
+      '<div class="field-row">' +
+        '<div class="field"><label>Phone number</label><input type="tel" placeholder="+91 98765 43210" data-role="phone" data-idx="' + i + '"></div>' +
+        '<div class="field"><label>Email ID</label><input type="email" placeholder="doctor@email.com" data-role="email" data-idx="' + i + '"></div>' +
+      '</div>';
+    doctorFieldsEl.appendChild(block);
+  }
+}
+
+function calc() {
+  const n = parseInt(drCountEl.value);
+  const years = parseInt(planDurationEl.value);
+
+  // Floor pricing sourced from Pricing_sheet_11.xlsx — never shown directly.
+  const doctorsFloor = FLOOR_DR[n][years];
+  const staffFloor = staffFloorTotal(staffCount, years);
+
+  staffPriceBadge.textContent = "₹" + Math.round(FLOOR_STAFF_TIER1[years]).toLocaleString("en-IN") + " / staff";
+  staffHint.textContent = "Beyond the 1 staff login already included";
+
+  const doctorsMrp = n * MRP_PER_DR_YEAR * years;
+  let discounted = doctorsMrp;
+
+  // Discount level 1
+  const level1Pct = parseInt(level1El.value);
+  level1Out.textContent = level1Pct + "%";
+  if (level1Pct > 0) {
+    const amt = discounted * level1Pct / 100;
+    level1Line.style.display = "flex";
+    level1LineLabel.textContent = "Discount level 1 (" + level1Pct + "%)";
+    level1LineAmt.textContent = "-" + inr(amt);
+    discounted -= amt;
+  } else {
+    level1Line.style.display = "none";
+  }
+
+  // Festival offer
+  const festivalPct = parseInt(festivalEl.value);
+  festivalOut.textContent = festivalPct + "%";
+  if (festivalPct > 0) {
+    const amt = discounted * festivalPct / 100;
+    festivalLine.style.display = "flex";
+    festivalLineLabel.textContent = "Festival offer (" + festivalPct + "%)";
+    festivalLineAmt.textContent = "-" + inr(amt);
+    discounted -= amt;
+  } else {
+    festivalLine.style.display = "none";
+  }
+
+  // Employee coupon
+  if (couponSelect.value === "apply") {
+    const amt = discounted * 0.05;
+    couponLine.style.display = "flex";
+    couponLineAmt.textContent = "-" + inr(amt);
+    discounted -= amt;
+  } else {
+    couponLine.style.display = "none";
+  }
+
+  // Manager discount (only once manager-approved)
+  const extraPct = parseInt(extraEl.value);
+  extraOut.textContent = extraPct + "%";
+  if (extraPct > 0 && extraApproved) {
+    const amt = discounted * extraPct / 100;
+    extraLine.style.display = "flex";
+    extraLineLabel.textContent = "Manager discount (" + extraPct + "%) — approved";
+    extraLineAmt.textContent = "-" + inr(amt);
+    discounted -= amt;
+  } else if (extraPct > 0) {
+    extraLine.style.display = "flex";
+    extraLineLabel.textContent = "Manager discount (" + extraPct + "%) — pending approval";
+    extraLineAmt.textContent = inr(0);
+  } else {
+    extraLine.style.display = "none";
+  }
+
+  // None of the levers above can push the doctor price below the sheet floor
+  const hitFloor = discounted < doctorsFloor;
+  if (hitFloor) discounted = doctorsFloor;
+  floorWarning.classList.toggle("show", hitFloor);
+
+  const doctorDiscountedOnly = discounted;
+
+  // Staff add-on — priced straight from the sheet, not discounted further
+  if (staffCount > 0) {
+    staffLine.style.display = "flex";
+    staffLineLabel.textContent = "Extra staff (" + staffCount + ")";
+    staffLineAmt.textContent = inr(staffFloor);
+    discounted += staffFloor;
+  } else {
+    staffLine.style.display = "none";
+  }
+
+  durationLine.style.display = "none"; // multi-year saving is now baked into the sheet floor
+
+  const gst = discounted * GST_RATE;
+  const total = discounted + gst;
+
+  gstAmt.textContent = inr(gst);
+  totalAmt.textContent = inr(total);
+
+  // MRP reference + savings badge (doctor portion only, staff/GST excluded
+  // so the badge never shows a misleading negative percentage)
+  mrpAmt.textContent = inr(doctorsMrp);
+  const savingsPct = Math.max(0, Math.round((1 - doctorDiscountedOnly / doctorsMrp) * 100));
+  savingsBadge.textContent = "You save " + savingsPct + "% off MRP";
+}
+
+// Plan duration
+planDurationEl.addEventListener("change", () => {
+  const years = parseInt(planDurationEl.value);
+  durationBadge.textContent = years === 1 ? "1 year" : years + " years";
+  durationUrgency.classList.toggle("show", years > 1);
+  calc();
+});
+
+// Doctor count change
+drCountEl.addEventListener("change", () => { renderDoctorFields(); calc(); });
+
+// Staff stepper
+staffMinus.addEventListener("click", () => { if (staffCount > 0) staffCount--; staffCountEl.textContent = staffCount; calc(); });
+staffPlus.addEventListener("click", () => { if (staffCount < 5) staffCount++; staffCountEl.textContent = staffCount; calc(); });
+
+// Employee coupon — RM must explicitly select it, not auto-applied
+couponSelect.addEventListener("change", () => {
+  revealSummary();
+  if (couponSelect.value === "apply") {
+    couponUrgency.classList.add("show");
+  } else {
+    couponUrgency.classList.remove("show");
+  }
+  calc();
+});
+
+// Discount level 1
+level1El.addEventListener("input", () => { revealSummary(); calc(); });
+
+// Festival offer
+festivalEl.addEventListener("input", () => { revealSummary(); calc(); });
+
+// Extra negotiation slider + manager approval
+extraEl.addEventListener("input", () => {
+  revealSummary();
+  const val = parseInt(extraEl.value);
+  if (val > 0) {
+    approvalBox.classList.add("show");
+    if (extraApproved) {
+      extraApproved = false;
+      approvalBox.classList.remove("approved");
+      approvalStatus.textContent = "Requires manager approval to apply";
+      approvalBtn.textContent = "Send for approval";
+      approvalBtn.disabled = false;
+    }
+  } else {
+    approvalBox.classList.remove("show", "approved");
+    extraApproved = false;
+    approvalStatus.textContent = "Requires manager approval to apply";
+    approvalBtn.textContent = "Send for approval";
+    approvalBtn.disabled = false;
+  }
+  calc();
+});
+
+approvalBtn.addEventListener("click", () => {
+  approvalBtn.textContent = "Waiting for manager…";
+  approvalBtn.disabled = true;
+  approvalStatus.textContent = "Waiting for manager to approve…";
+  setTimeout(() => {
+    extraApproved = true;
+    approvalBox.classList.add("approved");
+    approvalStatus.textContent = "Manager approved ✓";
+    approvalBtn.textContent = "Approved";
+    calc();
+  }, 10000); // 10 seconds
+});
+
+// Confirm price + timer
+function exitConfirmedState() {
+  confirmed = false;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerBox.classList.remove("show");
+  confirmBtn.textContent = "Confirm price";
+  confirmBtn.disabled = false;
+}
+
+function startTimer() {
+  let seconds = 10 * 60;
+  const render = () => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    timerText.textContent = m + ":" + s;
+  };
+  render();
+  timerInterval = setInterval(() => {
+    seconds--;
+    if (seconds <= 0) {
+      clearInterval(timerInterval);
+      timerText.textContent = "Expired";
+      confirmBtn.textContent = "Offer expired — re-confirm";
+      confirmBtn.disabled = false;
+      confirmed = false;
+      return;
+    }
+    render();
+  }, 1000);
+}
+
+confirmBtn.addEventListener("click", () => {
+  if (confirmed) return;
+  confirmed = true;
+  confirmBtn.textContent = "Price confirmed";
+  confirmBtn.disabled = true;
+  timerBox.classList.add("show");
+  startTimer();
+});
+
+renderDoctorFields();
+calc();
+</script>
+
+</body>
+</html>
